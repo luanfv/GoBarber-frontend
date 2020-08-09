@@ -1,13 +1,14 @@
 import React, { useCallback, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import { FiArrowLeft, FiMail, FiUser, FiLock } from 'react-icons/fi';
+import * as Yup from 'yup';
+import { Form } from '@unform/web';
+import { FormHandles } from '@unform/core';
+
 import { Container, Content, Background, AnimationContainer } from './style';
 import logoImg from './../../assets/logo.svg';
-import { FiArrowLeft, FiMail, FiUser, FiLock } from 'react-icons/fi';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import { Form } from '@unform/web';
-import * as Yup from 'yup';
-import { FormHandles } from '@unform/core';
 import getValidationErrors from './../../utils/getValidationErrors';
 import api from './../../services/api';
 import { useToast } from './../../hooks/toast';
