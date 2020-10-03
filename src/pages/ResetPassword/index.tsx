@@ -48,8 +48,6 @@ const ResetPassword: React.FC = () => {
             if (!token) 
                 throw new Error();
 
-            console.log(token);
-
             await api.post('/password/reset', { password, password_confirmation, token });
 
             history.push('/');
@@ -66,8 +64,7 @@ const ResetPassword: React.FC = () => {
                 description: 'Ocorreu um erro ao resetar sua senha, tente novamente.',
             });
         }
-
-    }, [ResetPassword, addToast, history, location]);
+    }, [addToast, history, location]);
 
     return (
         <Container>

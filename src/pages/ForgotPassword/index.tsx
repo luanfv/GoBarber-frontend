@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FiLogIn, FiMail } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -28,8 +28,6 @@ const ForgotPassword: React.FC = () => {
 
     const { addToast } = useToast();
 
-    const history = useHistory();
-
     const handleSubmit = useCallback(async (data: ForgotPasswordFormData) => {
         try {
             setIsLoading(true);
@@ -46,8 +44,6 @@ const ForgotPassword: React.FC = () => {
 
             const { email } = data;
 
-            // Recuperação de senha
-
             await api.post('/password/forgot', { email });
 
             addToast({
@@ -55,8 +51,6 @@ const ForgotPassword: React.FC = () => {
                 title: 'E-mail de recuperação enviado!',
                 description: 'Enviamos um e-mail para confirmar a recuperação de senha.'
             });
-
-            // history.push('/dashboard');
         } 
         catch (err) {
             if (err instanceof Yup.ValidationError) {
