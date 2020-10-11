@@ -5,6 +5,7 @@ interface User {
     id: string;
     avatar_url: string;
     name: string;
+    email: string;
 }
 interface AuthState {
     token: string;
@@ -31,8 +32,6 @@ export const AuthProvider: React.FC = ({ children }) => {
 
         if (token && user) {
             api.defaults.headers.authorization = `Bearer ${token}`;
-
-            console.log(`Bearer ${token}`);
             
             return { token, user: JSON.parse(user) };
         }
