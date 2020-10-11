@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react';
-import { isToday, format } from 'date-fns';
+import { isToday, format, parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR'
 import { FiClock, FiPower } from 'react-icons/fi';
 import DayPicker, { DayModifiers } from 'react-day-picker';
@@ -32,6 +32,7 @@ interface MonthAvailabilityItem {
 interface Appointment {
     id: string;
     date: string;
+    hourFormatted: string;
     user: {
         name: string;
         avatar_url: string;
@@ -79,6 +80,18 @@ const Dashboard: React.FC = () => {
         return format(selectedDate, "cccc", { locale: ptBR })
     }, [selectedDate]);
 
+    const morningAppointments = useMemo(() => {
+        return appointments.filter(appointments => {
+            return parseISO(appointments.date).getHours() < 12;
+        });
+    }, [appointments]);
+
+    const afternoonAppointments = useMemo(() => {
+        return appointments.filter(appointments => {
+            return parseISO(appointments.date).getHours() >= 12;
+        });
+    }, [appointments]);
+
     useEffect(() => {
         api.get(`/providers/${user.id}/month-availability`, {
             params: {
@@ -92,7 +105,7 @@ const Dashboard: React.FC = () => {
     }, [currentMonth, user.id]);
 
     useEffect(() => {
-        api.get('/appointments/me', {
+        api.get<Appointment[]>('/appointments/me', {
             params: {
                 year: selectedDate.getFullYear(),
                 month: selectedDate.getMonth() + 1,
@@ -100,8 +113,13 @@ const Dashboard: React.FC = () => {
             }
         })
         .then(response => {
-            setAppointments(response.data);
-            console.log(response.data);
+            const appointmentsFormatted = response.data.map(appointment => { 
+                return {
+                    ...appointment,
+                    hourFormatted: format(parseISO(appointment.date), 'HH:mm')
+                }
+            });
+            setAppointments(appointmentsFormatted);
         });
     }, [selectedDate]);
 
@@ -158,81 +176,53 @@ const Dashboard: React.FC = () => {
                     <Section>
                         <strong>Manhã</strong>
 
-                        <Appointment>
-                            <span>
-                                <FiClock />
-                                08:00
-                            </span>
+                        {
+                            morningAppointments.map(appointment => (
+                                <Appointment key={appointment.id}>
+                                    <span>
+                                        <FiClock />
+                                        {appointment.hourFormatted}
+                                    </span>
 
-                            <div>
-                                <img 
-                                    src={user.avatar_url}
-                                    alt={user.name}
-                                />
+                                    <div>
+                                        <img 
+                                            src={appointment.user.avatar_url}
+                                            alt={appointment.user.name}
+                                        />
 
-                                <strong>
-                                    {user.name}
-                                </strong>
-                            </div>
-                        </Appointment>
-
-                        <Appointment>
-                            <span>
-                                <FiClock />
-                                09:00
-                            </span>
-
-                            <div>
-                                <img 
-                                    src={user.avatar_url}
-                                    alt={user.name}
-                                />
-
-                                <strong>
-                                    {user.name}
-                                </strong>
-                            </div>
-                        </Appointment>
+                                        <strong>
+                                            {appointment.user.name}
+                                        </strong>
+                                    </div>
+                                </Appointment>
+                            ))
+                        }
                     </Section>
 
                     <Section>
                         <strong>Tarde</strong>
 
-                        <Appointment>
-                            <span>
-                                <FiClock />
-                                14:00
-                            </span>
+                        {
+                            afternoonAppointments.map(appointment => (
+                                <Appointment key={appointment.id}>
+                                    <span>
+                                        <FiClock />
+                                        {appointment.hourFormatted}
+                                    </span>
 
-                            <div>
-                                <img 
-                                    src={user.avatar_url}
-                                    alt={user.name}
-                                />
+                                    <div>
+                                        <img 
+                                            src={appointment.user.avatar_url}
+                                            alt={appointment.user.name}
+                                        />
 
-                                <strong>
-                                    {user.name}
-                                </strong>
-                            </div>
-                        </Appointment>
-
-                        <Appointment>
-                            <span>
-                                <FiClock />
-                                15:00
-                            </span>
-
-                            <div>
-                                <img 
-                                    src={user.avatar_url}
-                                    alt={user.name}
-                                />
-
-                                <strong>
-                                    {user.name}
-                                </strong>
-                            </div>
-                        </Appointment>
+                                        <strong>
+                                            {appointment.user.name}
+                                        </strong>
+                                    </div>
+                                </Appointment>
+                            ))
+                        }
                     </Section>
                 </Schedule>
                 <Calendar>
